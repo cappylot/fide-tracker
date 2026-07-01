@@ -83,7 +83,7 @@ actor FIDEDatabase {
     static let shared = FIDEDatabase()
 
     /// Set this to your GitHub "owner/repo" (the fork you push the workflow to).
-    private let repoSlug = "YOUR_USER/fide-tracker"
+    private let repoSlug = "cappylot/fide-tracker"
 
     private let tagDefaultsKey = "fide_db_release_tag"
     private var dbQueue: DatabaseQueue?
