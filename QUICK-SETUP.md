@@ -19,17 +19,12 @@
 
 ## Step 3: Set up the iOS app (3 min)
 
-1. Open `ios/FideTracker/` in Xcode 15+
-2. **Add GRDB:**
-   - File → Add Packages
-   - Paste: `https://github.com/groue/GRDB.swift.git`
-   - Version: **"Up to Next Major (>= 6.0.0)"**
-   - Add to **FideTracker** target
-3. **Set your GitHub repo:**
+1. Open `ios/FideTracker.xcodeproj` in Xcode 15+ (GRDB is already set up as a package dependency)
+2. **Set your GitHub repo:**
    - Open `ios/FideTracker/Services/FIDEDatabase.swift`
    - Near the top of the `FIDEDatabase` actor, change the `repoSlug` constant
-     from `"YOUR_USER/fide-tracker"` to your own `"owner/repo"`
-4. **Build & run** on the Simulator or a device
+     to your own `"owner/repo"`
+3. **Build & run** on the Simulator or a device
 
 On first launch, the app will download `fide.db` (~500 MB, ~30 sec on WiFi). After that, search/top/charts are instant.
 

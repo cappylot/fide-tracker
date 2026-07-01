@@ -194,7 +194,7 @@ actor FIDEDatabase {
 
     func meta() async throws -> Meta {
         let queue = try requireQueue()
-        return try queue.read { db in
+        return try await queue.read { db in
             let periods = try String.fetchAll(
                 db, sql: "SELECT DISTINCT period FROM rating_snapshot ORDER BY period DESC"
             )
@@ -206,7 +206,7 @@ actor FIDEDatabase {
     func search(_ query: String, limit: Int = 25) async throws -> [PlayerSummary] {
         let queue = try requireQueue()
         let trimmed = query.trimmingCharacters(in: .whitespaces)
-        return try queue.read { db in
+        return try await queue.read { db in
             let latest = try String.fetchOne(db, sql: "SELECT MAX(period) FROM rating_snapshot")
 
             let rows: [SummaryRow]
@@ -238,7 +238,7 @@ actor FIDEDatabase {
 
     func player(_ fideId: Int) async throws -> PlayerDetail {
         let queue = try requireQueue()
-        return try queue.read { db in
+        return try await queue.read { db in
             guard let row = try DetailRow.fetchOne(db, sql: """
                 SELECT p.fide_id, p.name, p.federation, p.title, p.sex, p.birth_year, p.flag,
                        s.standard, s.rapid, s.blitz, s.period AS latest_period
@@ -255,7 +255,7 @@ actor FIDEDatabase {
 
     func history(_ fideId: Int) async throws -> RatingHistory {
         let queue = try requireQueue()
-        return try queue.read { db in
+        return try await queue.read { db in
             guard let name = try String.fetchOne(
                 db, sql: "SELECT name FROM player WHERE fide_id = ?", arguments: [fideId]
             ) else { throw DBError.notFound }
@@ -273,7 +273,7 @@ actor FIDEDatabase {
 
     func change(_ fideId: Int, from: String, to: String) async throws -> RatingChange {
         let queue = try requireQueue()
-        return try queue.read { db in
+        return try await queue.read { db in
             guard let name = try String.fetchOne(
                 db, sql: "SELECT name FROM player WHERE fide_id = ?", arguments: [fideId]
             ) else { throw DBError.notFound }
@@ -304,7 +304,7 @@ actor FIDEDatabase {
         let queue = try requireQueue()
         // Safe interpolation: `type.rawValue` is a fixed enum value, not input.
         let col = type.rawValue
-        return try queue.read { db in
+        return try await queue.read { db in
             var sql = """
                 SELECT p.fide_id, p.name, p.federation, p.title, p.flag,
                        s.standard, s.rapid, s.blitz

@@ -1,0 +1,43 @@
+# Regenerate the Xcode project after adding/removing files:
+#   cd ios && xcodegen generate
+name: FideTracker
+options:
+  bundleIdPrefix: com.cappylot
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+
+packages:
+  GRDB:
+    url: https://github.com/groue/GRDB.swift
+    from: 6.29.3
+
+targets:
+  FideTracker:
+    type: application
+    platform: iOS
+    sources:
+      - path: FideTracker
+        excludes:
+          - "**/.DS_Store"
+    dependencies:
+      - package: GRDB
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.cappylot.fidetracker
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: Z8UZBY7LU8
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: 1.0
+    info:
+      path: FideTracker/Info.plist
+      properties:
+        CFBundleDisplayName: FIDE Tracker
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        ITSAppUsesNonExemptEncryption: false
+    scheme: {}

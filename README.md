@@ -35,14 +35,11 @@ This is the completely free path: GitHub Actions (unlimited free minutes on publ
 
 ### iOS App
 
-1. Open `ios/FideTracker/` in Xcode 15+.
-2. **Add GRDB dependency:**
-   - File > Add Packages
-   - Enter: `https://github.com/groue/GRDB.swift.git`
-   - Version: Up to Next Major (`>= 6.0.0`)
-   - Add to `FideTracker` target
-3. **Set your GitHub repo** in `Services/FIDEDatabase.swift`: change the `repoSlug` constant near the top of the actor from `"YOUR_USER/fide-tracker"` to your own `"owner/repo"` (the fork you pushed the workflow to).
-4. Build and run.
+1. Open `ios/FideTracker.xcodeproj` in Xcode 15+. GRDB is already configured as a Swift Package dependency; Xcode resolves it automatically on first open.
+2. **Set your GitHub repo** in `Services/FIDEDatabase.swift`: change the `repoSlug` constant near the top of the actor to your own `"owner/repo"` (the fork you pushed the workflow to).
+3. Build and run.
+
+The project is generated from `ios/project.yml` with [XcodeGen](https://github.com/yonaskolb/XcodeGen). After adding or removing source files, run `cd ios && xcodegen generate` (the `.xcodeproj` is committed, so this is only needed when the file list changes).
 
 On first launch, the app downloads `fide.db` from your GitHub Release (~30 seconds on WiFi). After that, all searches/lists/charts run instantly locally.
 
