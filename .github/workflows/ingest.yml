@@ -1,0 +1,82 @@
+name: FIDE monthly ingestion (build SQLite)
+
+# Fully automatic, zero cost. Runs daily and publishes a new SQLite database
+# only when FIDE actually releases a new monthly list.
+#
+# Change detection is keyed off the FIDE list's rating PERIOD (YYYY-MM), which
+# we read cheaply from the download's Last-Modified header. Each monthly list
+# becomes one release tagged "fide-YYYY-MM", so a daily run that finds an
+# already-published period does nothing (no download, no build, no release).
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+# gh release create needs write access to repository contents.
+permissions:
+  contents: write
+
+concurrency:
+  group: fide-ingestion
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        working-directory: backend
+        run: pip install -r requirements.txt
+
+      - name: Determine current FIDE rating period
+        id: period
+        working-directory: backend
+        # Cheap HEAD request (falls back to a full download only if FIDE omits
+        # the Last-Modified header). Prints e.g. "2026-06".
+        run: |
+          PERIOD="$(python -m ingestion.ingest --print-period)"
+          if [ -z "$PERIOD" ]; then
+            echo "Could not determine rating period." >&2
+            exit 1
+          fi
+          echo "value=$PERIOD" >> "$GITHUB_OUTPUT"
+          echo "FIDE current period: $PERIOD"
+
+      - name: Check whether this period is already published
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="fide-${{ steps.period.outputs.value }}"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "Release $TAG already exists — nothing to do."
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+            echo "No release for $TAG yet — will build and publish."
+          fi
+
+      - name: Build SQLite database
+        if: steps.check.outputs.publish == 'true'
+        working-directory: backend
+        run: |
+          python -m ingestion.ingest --period "${{ steps.period.outputs.value }}"
+          ls -lh fide.db
+
+      - name: Publish release
+        if: steps.check.outputs.publish == 'true'
+        working-directory: backend
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="fide-${{ steps.period.outputs.value }}"
+          gh release create "$TAG" fide.db \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "FIDE ratings ${{ steps.period.outputs.value }}" \
+            --notes "Monthly FIDE rating snapshot (${{ steps.period.outputs.value }}). The app downloads fide.db from the latest release automatically."

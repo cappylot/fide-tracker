@@ -1,0 +1,15 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Local database + downloaded FIDE files
+*.db
+*.zip
+players_list_xml*.xml
+
+# Xcode
+xcuserdata/
+*.xcworkspace/xcuserdata/
+DerivedData/
+.DS_Store

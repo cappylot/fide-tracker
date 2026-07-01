@@ -1,0 +1,7 @@
+# Dependencies for the free path: download the FIDE list and build a SQLite file.
+sqlalchemy==2.0.36
+requests==2.32.3
+
+# Only needed if you point DATABASE_URL at Postgres instead of the default
+# SQLite (the free path doesn't need it):
+# psycopg[binary]==3.2.3
