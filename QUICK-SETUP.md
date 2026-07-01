@@ -12,8 +12,10 @@
 1. Click **Actions** tab
 2. Select **"FIDE monthly ingestion (build SQLite)"**
 3. Click **"Run workflow"** → **"Run workflow"**
-4. Wait ~5 minutes for it to finish
-5. Click **Releases** tab — you'll see `fide-YYYYMMDD` with `fide.db` attached
+4. Wait for it to finish — the **first run backfills the last 24 months** of
+   FIDE archives so charts have history from day one (~1–2 hours). Every
+   later run reuses the previous release and takes ~5 minutes.
+5. Click **Releases** tab — you'll see `fide-YYYY-MM` with `fide.db` attached
 
 (Or just wait until tomorrow at 03:00 UTC for the scheduled run.)
 
@@ -31,9 +33,13 @@ On first launch, the app will download `fide.db` (~500 MB, ~30 sec on WiFi). Aft
 ## How it works
 
 - **GitHub Action** (runs daily at 03:00 UTC)
+  - First run only: backfills the last 24 months from FIDE's archived
+    monthly lists, storing each player's rating change-points so the
+    database stays phone-sized
   - Downloads the latest FIDE rating list from `ratings.fide.com`
-  - Parses it into SQLite
-  - Only uploads if the file changed (no duplicate releases)
+  - Seeds from the previous release and adds the new month (history
+    accumulates month over month)
+  - Only publishes when FIDE releases a new monthly list
   - Publishes to GitHub Releases (free storage, free bandwidth)
 
 - **iOS app** (downloads on first launch, then monthly)

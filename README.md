@@ -10,8 +10,8 @@ This is the completely free path: GitHub Actions (unlimited free minutes on publ
     FIDE (ratings.fide.com)
           ↓
    GitHub Action (daily)
-   ├─ Download players_list_xml.zip
-   ├─ Parse into SQLite
+   ├─ First run: backfill 24 months of archived lists
+   ├─ Every month: seed from previous release, add the new list
    └─ Upload to Release (if changed)
           ↓
    iOS app (SwiftUI)
@@ -20,8 +20,8 @@ This is the completely free path: GitHub Actions (unlimited free minutes on publ
    └─ Check for updates monthly
 ```
 
-- **GitHub Action** (`.github/workflows/ingest.yml`) runs daily. It downloads the latest FIDE monthly list, hashes it, and skips upload if nothing changed. On update, it publishes the new SQLite as a GitHub Release. **This is free** — even on private repos, you get 2000 free minutes/month, and one monthly ingest is ~2–3 minutes.
-- **The database** is a single SQLite file (~500 MB for the full FIDE dataset, smaller for active-only). Kept in GitHub Releases as an artifact.
+- **GitHub Action** (`.github/workflows/ingest.yml`) runs daily. On the very first run it backfills the last 24 months from FIDE's archived monthly lists (`ingestion/backfill.py`, ~1–2 hours), so rating charts have two years of history from day one. After that, each monthly run seeds the database from the previous release, adds the new month on top, and publishes it as a GitHub Release — so history keeps accumulating. **This is free** — even on private repos, you get 2000 free minutes/month, and a monthly incremental ingest is ~2–3 minutes.
+- **The database** is a single SQLite file kept in GitHub Releases. To stay phone-download-sized, backfilled months store only *rating change-points* per player (the newest months are always complete — the app's search/top/delta queries rely on that); storing every player × month would be several GB. Expect roughly 500 MB–1 GB with history.
 - **The app** downloads the DB on first launch (happens in the background), stores it in `Documents/`, and queries it locally. Monthly, it checks for an updated version and pulls it if the database hash changed.
 
 ## Setup (completely free)

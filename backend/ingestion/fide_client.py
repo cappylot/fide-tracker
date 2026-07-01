@@ -26,6 +26,13 @@ import requests
 FIDE_XML_ZIP_URL = "https://ratings.fide.com/download/players_list_xml.zip"
 USER_AGENT = "fide-tracker/1.0 (+monthly rating-history sync)"
 
+# Archived per-type monthly lists, e.g. standard_jan25frl_xml.zip. Unlike the
+# combined list above, each archive carries a single <rating>/<games> pair for
+# its own rating type.
+ARCHIVE_URL_TEMPLATE = "https://ratings.fide.com/download/{kind}_{mon}{yy}frl_xml.zip"
+MONTH_ABBR = ("jan", "feb", "mar", "apr", "may", "jun",
+              "jul", "aug", "sep", "oct", "nov", "dec")
+
 
 @dataclass
 class DownloadResult:
@@ -65,6 +72,15 @@ def _period_from_headers(headers) -> str:
         or datetime.now(timezone.utc).strftime("%Y-%m")
 
 
+def _extract_first_xml(raw: bytes, dest_dir: Path) -> Path:
+    """Extract the first .xml member of a zip (FIDE zips hold exactly one,
+    but we match by extension defensively in case the filename changes)."""
+    with zipfile.ZipFile(io.BytesIO(raw)) as zf:
+        xml_name = next(n for n in zf.namelist() if n.lower().endswith(".xml"))
+        zf.extract(xml_name, dest_dir)
+        return dest_dir / xml_name
+
+
 def download_latest(dest_dir: Path | None = None, url: str = FIDE_XML_ZIP_URL) -> DownloadResult:
     dest_dir = Path(dest_dir or tempfile.mkdtemp(prefix="fide_"))
     dest_dir.mkdir(parents=True, exist_ok=True)
@@ -74,18 +90,40 @@ def download_latest(dest_dir: Path | None = None, url: str = FIDE_XML_ZIP_URL) -
         period = _period_from_headers(resp.headers)
         raw = resp.content  # ~40-50 MB zip; fine to hold in memory once
 
-    sha256 = hashlib.sha256(raw).hexdigest()
+    return DownloadResult(
+        xml_path=_extract_first_xml(raw, dest_dir),
+        sha256=hashlib.sha256(raw).hexdigest(),
+        period=period,
+        size_bytes=len(raw),
+    )
 
-    with zipfile.ZipFile(io.BytesIO(raw)) as zf:
-        # The member is normally players_list_xml_foa.xml, but pick the first
-        # .xml defensively in case FIDE tweaks the filename.
-        xml_name = next(n for n in zf.namelist() if n.lower().endswith(".xml"))
-        zf.extract(xml_name, dest_dir)
-        xml_path = dest_dir / xml_name
+
+def archive_url(kind: str, period: str) -> str:
+    """URL of the archived list of one kind ('standard' | 'rapid' | 'blitz')
+    for a 'YYYY-MM' period, e.g. ('standard', '2025-01') ->
+    .../standard_jan25frl_xml.zip"""
+    year, month = period.split("-")
+    return ARCHIVE_URL_TEMPLATE.format(
+        kind=kind, mon=MONTH_ABBR[int(month) - 1], yy=year[-2:]
+    )
+
+
+def download_archive(kind: str, period: str, dest_dir: Path | None = None) -> DownloadResult | None:
+    """Download one archived monthly list, or None if FIDE hasn't published
+    an archive for that period (404)."""
+    url = archive_url(kind, period)
+    with requests.get(url, headers={"User-Agent": USER_AGENT}, stream=True, timeout=300) as resp:
+        if resp.status_code == 404:
+            return None
+        resp.raise_for_status()
+        raw = resp.content  # ~5-15 MB per archive zip
+
+    dest_dir = Path(dest_dir or tempfile.mkdtemp(prefix=f"fide_{kind}_"))
+    dest_dir.mkdir(parents=True, exist_ok=True)
 
     return DownloadResult(
-        xml_path=xml_path,
-        sha256=sha256,
+        xml_path=_extract_first_xml(raw, dest_dir),
+        sha256=hashlib.sha256(raw).hexdigest(),
         period=period,
         size_bytes=len(raw),
     )

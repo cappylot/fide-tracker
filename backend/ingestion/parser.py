@@ -66,3 +66,39 @@ def iter_players(xml_path) -> Iterator[dict]:
         seen += 1
         if seen % 5000 == 0:
             root.clear()  # drop the accumulated (already-emitted) siblings
+
+
+def iter_archive_players(xml_path) -> Iterator[dict]:
+    """Yield one dict per <player> from an archived per-type list
+    (standard_jan25frl_xml.zip etc.).
+
+    These lists share the combined list's identity fields but carry a single
+    generic <rating>/<games> pair for their own rating type; the caller maps
+    it onto the right snapshot column.
+    """
+    context = iterparse(xml_path, events=("start", "end"))
+    _, root = next(context)
+
+    seen = 0
+    for event, elem in context:
+        if event != "end" or elem.tag != "player":
+            continue
+
+        yield {
+            "fide_id": _int(elem, "fideid"),
+            "name": _text(elem, "name"),
+            "federation": _text(elem, "country"),
+            "sex": _text(elem, "sex"),
+            "title": _text(elem, "title"),
+            "w_title": _text(elem, "w_title"),
+            "o_title": _text(elem, "o_title"),
+            "birth_year": _int(elem, "birthday"),
+            "flag": _text(elem, "flag"),
+            "rating": _int(elem, "rating"),
+            "games": _int(elem, "games"),
+        }
+
+        elem.clear()
+        seen += 1
+        if seen % 5000 == 0:
+            root.clear()

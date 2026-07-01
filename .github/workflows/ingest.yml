@@ -62,11 +62,34 @@ jobs:
             echo "No release for $TAG yet — will build and publish."
           fi
 
-      - name: Build SQLite database
+      - name: Seed database from the previous release
+        if: steps.check.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Each release ships the full history, so start from the previous
+        # database and add the new month on top. On the very first run there
+        # is nothing to download and the backfill below builds the history.
+        run: |
+          if gh release download --repo "$GITHUB_REPOSITORY" --pattern fide.db --dir backend; then
+            echo "Seeded backend/fide.db from the latest release."
+          else
+            echo "No previous release — the backfill step will build the history."
+          fi
+
+      - name: Backfill history (last 24 months)
+        if: steps.check.outputs.publish == 'true'
+        working-directory: backend
+        # One-time: downloads FIDE's archived monthly lists so charts have
+        # two years of data (~1-2 h on the first run). Once the seeded
+        # database already contains the history this is a no-op.
+        run: python -m ingestion.backfill --months 24
+
+      - name: Build SQLite database (current month)
         if: steps.check.outputs.publish == 'true'
         working-directory: backend
         run: |
           python -m ingestion.ingest --period "${{ steps.period.outputs.value }}"
+          sqlite3 fide.db "VACUUM;"
           ls -lh fide.db
 
       - name: Publish release
