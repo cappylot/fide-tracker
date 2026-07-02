@@ -1,0 +1,119 @@
+{
+  "" : {
+    "diagnostics" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FideTracker-primary.dia",
+    "emit-module-dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FideTracker-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FideTracker-primary-emit-module.dia",
+    "pch" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FideTracker-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FideTracker-primary.swiftdeps"
+  },
+  "/Users/orfeokaplow/fide-tracker/ios/FideTracker/FideTrackerApp.swift" : {
+    "const-values" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FideTrackerApp.swiftconstvalues",
+    "dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FideTrackerApp.d",
+    "diagnostics" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FideTrackerApp.dia",
+    "index-unit-output-path" : "/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FideTrackerApp.o",
+    "llvm-bc" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FideTrackerApp.bc",
+    "object" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FideTrackerApp.o",
+    "swift-dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FideTrackerApp.swiftdeps",
+    "swiftmodule" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FideTrackerApp~partial.swiftmodule"
+  },
+  "/Users/orfeokaplow/fide-tracker/ios/FideTracker/Models/Models.swift" : {
+    "const-values" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/Models.swiftconstvalues",
+    "dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/Models.d",
+    "diagnostics" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/Models.dia",
+    "index-unit-output-path" : "/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/Models.o",
+    "llvm-bc" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/Models.bc",
+    "object" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/Models.o",
+    "swift-dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/Models.swiftdeps",
+    "swiftmodule" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/Models~partial.swiftmodule"
+  },
+  "/Users/orfeokaplow/fide-tracker/ios/FideTracker/Services/FIDEDatabase.swift" : {
+    "const-values" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FIDEDatabase.swiftconstvalues",
+    "dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FIDEDatabase.d",
+    "diagnostics" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FIDEDatabase.dia",
+    "index-unit-output-path" : "/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FIDEDatabase.o",
+    "llvm-bc" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FIDEDatabase.bc",
+    "object" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FIDEDatabase.o",
+    "swift-dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FIDEDatabase.swiftdeps",
+    "swiftmodule" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FIDEDatabase~partial.swiftmodule"
+  },
+  "/Users/orfeokaplow/fide-tracker/ios/FideTracker/Services/FuzzyNameQuery.swift" : {
+    "const-values" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FuzzyNameQuery.swiftconstvalues",
+    "dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FuzzyNameQuery.d",
+    "diagnostics" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FuzzyNameQuery.dia",
+    "index-unit-output-path" : "/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FuzzyNameQuery.o",
+    "llvm-bc" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FuzzyNameQuery.bc",
+    "object" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FuzzyNameQuery.o",
+    "swift-dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FuzzyNameQuery.swiftdeps",
+    "swiftmodule" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FuzzyNameQuery~partial.swiftmodule"
+  },
+  "/Users/orfeokaplow/fide-tracker/ios/FideTracker/Store/FavoritesStore.swift" : {
+    "const-values" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FavoritesStore.swiftconstvalues",
+    "dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FavoritesStore.d",
+    "diagnostics" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FavoritesStore.dia",
+    "index-unit-output-path" : "/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FavoritesStore.o",
+    "llvm-bc" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FavoritesStore.bc",
+    "object" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FavoritesStore.o",
+    "swift-dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FavoritesStore.swiftdeps",
+    "swiftmodule" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/FavoritesStore~partial.swiftmodule"
+  },
+  "/Users/orfeokaplow/fide-tracker/ios/FideTracker/Store/SearchHistoryStore.swift" : {
+    "const-values" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/SearchHistoryStore.swiftconstvalues",
+    "dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/SearchHistoryStore.d",
+    "diagnostics" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/SearchHistoryStore.dia",
+    "index-unit-output-path" : "/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/SearchHistoryStore.o",
+    "llvm-bc" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/SearchHistoryStore.bc",
+    "object" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/SearchHistoryStore.o",
+    "swift-dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/SearchHistoryStore.swiftdeps",
+    "swiftmodule" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/SearchHistoryStore~partial.swiftmodule"
+  },
+  "/Users/orfeokaplow/fide-tracker/ios/FideTracker/Views/PlayerDetailView.swift" : {
+    "const-values" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/PlayerDetailView.swiftconstvalues",
+    "dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/PlayerDetailView.d",
+    "diagnostics" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/PlayerDetailView.dia",
+    "index-unit-output-path" : "/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/PlayerDetailView.o",
+    "llvm-bc" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/PlayerDetailView.bc",
+    "object" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/PlayerDetailView.o",
+    "swift-dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/PlayerDetailView.swiftdeps",
+    "swiftmodule" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/PlayerDetailView~partial.swiftmodule"
+  },
+  "/Users/orfeokaplow/fide-tracker/ios/FideTracker/Views/SearchView.swift" : {
+    "const-values" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/SearchView.swiftconstvalues",
+    "dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/SearchView.d",
+    "diagnostics" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/SearchView.dia",
+    "index-unit-output-path" : "/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/SearchView.o",
+    "llvm-bc" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/SearchView.bc",
+    "object" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/SearchView.o",
+    "swift-dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/SearchView.swiftdeps",
+    "swiftmodule" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/SearchView~partial.swiftmodule"
+  },
+  "/Users/orfeokaplow/fide-tracker/ios/FideTracker/Views/TopView.swift" : {
+    "const-values" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/TopView.swiftconstvalues",
+    "dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/TopView.d",
+    "diagnostics" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/TopView.dia",
+    "index-unit-output-path" : "/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/TopView.o",
+    "llvm-bc" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/TopView.bc",
+    "object" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/TopView.o",
+    "swift-dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/TopView.swiftdeps",
+    "swiftmodule" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/TopView~partial.swiftmodule"
+  },
+  "/Users/orfeokaplow/fide-tracker/ios/FideTracker/Views/TrackedView.swift" : {
+    "const-values" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/TrackedView.swiftconstvalues",
+    "dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/TrackedView.d",
+    "diagnostics" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/TrackedView.dia",
+    "index-unit-output-path" : "/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/TrackedView.o",
+    "llvm-bc" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/TrackedView.bc",
+    "object" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/TrackedView.o",
+    "swift-dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/TrackedView.swiftdeps",
+    "swiftmodule" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/TrackedView~partial.swiftmodule"
+  },
+  "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "const-values" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftconstvalues",
+    "dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/GeneratedAssetSymbols.d",
+    "diagnostics" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/GeneratedAssetSymbols.dia",
+    "index-unit-output-path" : "/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "swift-dependencies" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftdeps",
+    "swiftmodule" : "/Users/orfeokaplow/fide-tracker/ios/build/FideTracker.build/Debug-iphoneos/FideTracker.build/Objects-normal/arm64/GeneratedAssetSymbols~partial.swiftmodule"
+  }
+}

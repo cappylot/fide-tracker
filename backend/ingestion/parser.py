@@ -34,6 +34,14 @@ def _int(elem, tag) -> int | None:
         return None
 
 
+def _rating(elem, tag) -> int | None:
+    """The combined list writes <rating>0</rating> for players unrated in a
+    control (the per-type archives simply omit them). Store unrated as NULL
+    so rating columns never carry a fake 0."""
+    value = _int(elem, tag)
+    return value if value else None
+
+
 def iter_players(xml_path) -> Iterator[dict]:
     """Yield one dict per <player>, freeing memory as we advance."""
     context = iterparse(xml_path, events=("start", "end"))
@@ -54,9 +62,9 @@ def iter_players(xml_path) -> Iterator[dict]:
             "o_title": _text(elem, "o_title"),
             "birth_year": _int(elem, "birthday"),
             "flag": _text(elem, "flag"),
-            "standard": _int(elem, "rating"),
-            "rapid": _int(elem, "rapid_rating"),
-            "blitz": _int(elem, "blitz_rating"),
+            "standard": _rating(elem, "rating"),
+            "rapid": _rating(elem, "rapid_rating"),
+            "blitz": _rating(elem, "blitz_rating"),
             "standard_games": _int(elem, "games"),
             "rapid_games": _int(elem, "rapid_games"),
             "blitz_games": _int(elem, "blitz_games"),

@@ -64,17 +64,76 @@ struct LoaderView: View {
     }
 }
 
+enum AppSection: CaseIterable, Identifiable {
+    case search, top, tracked
+
+    var id: Self { self }
+
+    var title: String {
+        switch self {
+        case .search: return "Search"
+        case .top: return "Top"
+        case .tracked: return "Tracked"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .search: return "magnifyingglass"
+        case .top: return "trophy"
+        case .tracked: return "star"
+        }
+    }
+
+    @ViewBuilder
+    var destination: some View {
+        switch self {
+        case .search: SearchView()
+        case .top: TopView()
+        case .tracked: TrackedView()
+        }
+    }
+}
+
 struct RootView: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    var body: some View {
+        // iPhone (and iPad Slide Over) keeps the tab bar; full-screen iPad
+        // and Mac get a sidebar instead.
+        if horizontalSizeClass == .regular {
+            SplitRootView()
+        } else {
+            TabRootView()
+        }
+    }
+}
+
+struct TabRootView: View {
     var body: some View {
         TabView {
-            NavigationStack { SearchView() }
-                .tabItem { Label("Search", systemImage: "magnifyingglass") }
+            ForEach(AppSection.allCases) { section in
+                NavigationStack { section.destination }
+                    .tabItem { Label(section.title, systemImage: section.icon) }
+            }
+        }
+    }
+}
 
-            NavigationStack { TopView() }
-                .tabItem { Label("Top", systemImage: "trophy") }
+struct SplitRootView: View {
+    @State private var selection: AppSection? = .search
 
-            NavigationStack { TrackedView() }
-                .tabItem { Label("Tracked", systemImage: "star") }
+    var body: some View {
+        NavigationSplitView {
+            List(AppSection.allCases, selection: $selection) { section in
+                Label(section.title, systemImage: section.icon)
+            }
+            .navigationTitle("FIDE Tracker")
+        } detail: {
+            NavigationStack { (selection ?? .search).destination }
+                // Give each section its own stack so pushed player pages
+                // don't leak across sidebar switches.
+                .id(selection)
         }
     }
 }

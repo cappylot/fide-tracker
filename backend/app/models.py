@@ -86,6 +86,13 @@ class RatingSnapshot(Base):
     standard_games: Mapped[int | None] = mapped_column(Integer)
     rapid_games: Mapped[int | None] = mapped_column(Integer)
     blitz_games: Mapped[int | None] = mapped_column(Integer)
+    # FIDE activity is judged per time control: a player can be inactive on
+    # the standard list yet active on rapid/blitz (or vice versa). These come
+    # from the archived per-type lists; the combined list's Player.flag only
+    # mirrors the standard list. Same "i"/"w"/"wi" vocabulary as Player.flag.
+    standard_flag: Mapped[str | None] = mapped_column(String(4))
+    rapid_flag: Mapped[str | None] = mapped_column(String(4))
+    blitz_flag: Mapped[str | None] = mapped_column(String(4))
 
     __table_args__ = (
         UniqueConstraint("fide_id", "period", name="uq_snapshot_player_period"),
@@ -107,3 +114,17 @@ class IngestionRun(Base):
 
 def init_db() -> None:
     Base.metadata.create_all(engine)
+    _add_missing_columns()
+
+
+def _add_missing_columns() -> None:
+    """create_all() only creates missing tables. The CI build seeds each run
+    from the previous release's database, so a schema addition also has to be
+    applied to pre-existing tables here."""
+    from sqlalchemy import inspect, text
+
+    existing = {c["name"] for c in inspect(engine).get_columns("rating_snapshot")}
+    with engine.begin() as conn:
+        for col in ("standard_flag", "rapid_flag", "blitz_flag"):
+            if col not in existing:
+                conn.execute(text(f"ALTER TABLE rating_snapshot ADD COLUMN {col} VARCHAR(4)"))

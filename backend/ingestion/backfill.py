@@ -44,11 +44,13 @@ from ingestion.fide_client import download_archive  # noqa: E402
 from ingestion.ingest import CHUNK, PLAYER_COLS, _chunks, _upsert  # noqa: E402
 from ingestion.parser import iter_archive_players  # noqa: E402
 
-# (rating column, games column) fed by each archived list kind.
+# (rating column, games column, activity-flag column) fed by each archived
+# list kind. The flag matters: FIDE activity is per time control, and only
+# these per-type lists carry it (the combined list's flag mirrors standard).
 KIND_COLS = {
-    "standard": ("standard", "standard_games"),
-    "rapid": ("rapid", "rapid_games"),
-    "blitz": ("blitz", "blitz_games"),
+    "standard": ("standard", "standard_games", "standard_flag"),
+    "rapid": ("rapid", "rapid_games", "rapid_flag"),
+    "blitz": ("blitz", "blitz_games", "blitz_flag"),
 }
 
 
@@ -92,7 +94,7 @@ def _import_list(
     if result is None:
         return None
 
-    rating_col, games_col = KIND_COLS[kind]
+    rating_col, games_col, flag_col = KIND_COLS[kind]
     written = 0
     try:
         for batch in _chunks(iter_archive_players(result.xml_path), CHUNK):
@@ -123,13 +125,17 @@ def _import_list(
                 keep = batch if keep_all else changed
 
             if keep:
+                # Store "" (not NULL) for an active player: NULL is reserved
+                # for "this list didn't cover the player", which readers
+                # resolve by falling back to the global flag.
                 _upsert(
                     session,
                     RatingSnapshot.__table__,
                     [{"fide_id": p["fide_id"], "period": period,
-                      rating_col: p["rating"], games_col: p["games"]} for p in keep],
+                      rating_col: p["rating"], games_col: p["games"],
+                      flag_col: p["flag"] or ""} for p in keep],
                     index_elements=["fide_id", "period"],
-                    update_cols=[rating_col, games_col],
+                    update_cols=[rating_col, games_col, flag_col],
                 )
                 written += len(keep)
         session.commit()

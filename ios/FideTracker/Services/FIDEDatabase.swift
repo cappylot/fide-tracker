@@ -7,6 +7,13 @@ fileprivate func fideIsActive(_ flag: String?) -> Bool {
     !((flag ?? "").lowercased().contains("i"))
 }
 
+// Databases built before parser normalization store 0 for "unrated in this
+// control" (that's what the combined FIDE list publishes); treat it as no
+// rating rather than a real value.
+fileprivate func rated(_ value: Int?) -> Int? {
+    (value ?? 0) > 0 ? value : nil
+}
+
 // MARK: - Row types (GRDB decoding)
 
 fileprivate struct SummaryRow: Decodable, FetchableRecord {
@@ -26,7 +33,8 @@ fileprivate struct SummaryRow: Decodable, FetchableRecord {
 
     var summary: PlayerSummary {
         PlayerSummary(fideId: fideId, name: name, federation: federation, title: title,
-                      standard: standard, rapid: rapid, blitz: blitz, active: fideIsActive(flag))
+                      standard: rated(standard), rapid: rated(rapid), blitz: rated(blitz),
+                      active: fideIsActive(flag))
     }
 }
 
@@ -53,7 +61,8 @@ fileprivate struct DetailRow: Decodable, FetchableRecord {
     var detail: PlayerDetail {
         PlayerDetail(fideId: fideId, name: name, federation: federation, title: title,
                      sex: sex, birthYear: birthYear, latestPeriod: latestPeriod,
-                     standard: standard, rapid: rapid, blitz: blitz, active: fideIsActive(flag))
+                     standard: rated(standard), rapid: rated(rapid), blitz: rated(blitz),
+                     active: fideIsActive(flag))
     }
 }
 
@@ -87,6 +96,12 @@ actor FIDEDatabase {
 
     private let tagDefaultsKey = "fide_db_release_tag"
     private var dbQueue: DatabaseQueue?
+
+    /// Whether rating_snapshot carries per-time-control activity flags
+    /// (standard_flag/rapid_flag/blitz_flag). Databases released before that
+    /// schema addition only have the global player.flag, which FIDE derives
+    /// from the standard list alone.
+    private var hasPerControlFlags = false
 
     private var documentURL: URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -135,10 +150,12 @@ actor FIDEDatabase {
         config.readonly = true  // the app never writes; the DB is built in CI
         let queue = try DatabaseQueue(path: dbURL.path, configuration: config)
         // Sanity check that the schema is present.
-        try queue.read { db in
+        let perControlFlags = try queue.read { db -> Bool in
             _ = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM player")
+            return try db.columns(in: "rating_snapshot").contains { $0.name == "standard_flag" }
         }
         dbQueue = queue
+        hasPerControlFlags = perControlFlags
     }
 
     // MARK: - Release download
@@ -313,7 +330,8 @@ actor FIDEDatabase {
                 FROM rating_snapshot WHERE fide_id = ? ORDER BY period ASC
                 """, arguments: [fideId])
             let points = rows.map {
-                HistoryPoint(period: $0.period, standard: $0.standard, rapid: $0.rapid, blitz: $0.blitz)
+                HistoryPoint(period: $0.period, standard: rated($0.standard),
+                             rapid: rated($0.rapid), blitz: rated($0.blitz))
             }
             return RatingHistory(fideId: fideId, name: name, points: points)
         }
@@ -332,7 +350,7 @@ actor FIDEDatabase {
             else { throw DBError.notFound }
 
             func delta(_ x: Int?, _ y: Int?) -> Int? {
-                guard let x, let y else { return nil }
+                guard let x = rated(x), let y = rated(y) else { return nil }
                 return y - x
             }
             return RatingChange(
@@ -340,11 +358,14 @@ actor FIDEDatabase {
                 standardDelta: delta(a.standard, b.standard),
                 rapidDelta: delta(a.rapid, b.rapid),
                 blitzDelta: delta(a.blitz, b.blitz),
-                standardFrom: a.standard, standardTo: b.standard
+                standardFrom: rated(a.standard), standardTo: rated(b.standard)
             )
         }
     }
 
+    /// Mirrors how fide.com builds its Top-100 pages: only players active in
+    /// *that* time control are listed, ranked by rating, then by games played
+    /// in the current period, then by name.
     func top(type: RatingType = .standard,
              limit: Int = 100,
              federation: String? = nil,
@@ -352,14 +373,24 @@ actor FIDEDatabase {
         let queue = try requireQueue()
         // Safe interpolation: `type.rawValue` is a fixed enum value, not input.
         let col = type.rawValue
+        // Activity differs per time control (e.g. active in standard, inactive
+        // in blitz). Use the snapshot's per-control flag when the database has
+        // it; the global player.flag (= standard-list activity) is the best
+        // available fallback on older databases.
+        let flagExpr = hasPerControlFlags
+            ? "COALESCE(s.\(col)_flag, p.flag, '')"
+            : "COALESCE(p.flag, '')"
         return try await queue.read { db in
+            // The control's flag is aliased onto `flag` so PlayerSummary.active
+            // reflects activity in the list being shown.
             var sql = """
-                SELECT p.fide_id, p.name, p.federation, p.title, p.flag,
+                SELECT p.fide_id, p.name, p.federation, p.title,
+                       \(flagExpr) AS flag,
                        s.standard, s.rapid, s.blitz
                 FROM player p
                 JOIN rating_snapshot s ON s.fide_id = p.fide_id
                 WHERE s.period = (SELECT MAX(period) FROM rating_snapshot)
-                  AND s.\(col) IS NOT NULL
+                  AND s.\(col) > 0
                 """
             var args: [(any DatabaseValueConvertible)?] = []
             if let federation, !federation.isEmpty {
@@ -368,9 +399,9 @@ actor FIDEDatabase {
             }
             if activeOnly {
                 // Exclude "i" and "wi" (both contain "i"); keep "" and "w".
-                sql += " AND (p.flag IS NULL OR p.flag NOT LIKE '%i%')"
+                sql += " AND \(flagExpr) NOT LIKE '%i%'"
             }
-            sql += " ORDER BY s.\(col) DESC LIMIT ?"
+            sql += " ORDER BY s.\(col) DESC, s.\(col)_games DESC, p.name LIMIT ?"
             args.append(limit)
 
             let rows = try SummaryRow.fetchAll(db, sql: sql, arguments: StatementArguments(args))

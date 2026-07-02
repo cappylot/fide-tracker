@@ -62,8 +62,33 @@ jobs:
             echo "No release for $TAG yet — will build and publish."
           fi
 
-      - name: Seed database from the previous release
+      - name: Check this month's per-type archives are published
+        id: archives
         if: steps.check.outputs.publish == 'true'
+        # The archived standard/rapid/blitz lists are the only source of
+        # per-time-control activity flags (the combined list's flag mirrors
+        # the standard list). FIDE sometimes uploads them a little after the
+        # combined list, and a release is only ever built once per period —
+        # so defer the whole build until all three exist; the daily cron
+        # retries tomorrow.
+        run: |
+          PERIOD="${{ steps.period.outputs.value }}"
+          MON="$(date -u -d "${PERIOD}-01" +%b | tr '[:upper:]' '[:lower:]')"
+          YY="${PERIOD:2:2}"
+          READY=true
+          for kind in standard rapid blitz; do
+            URL="https://ratings.fide.com/download/${kind}_${MON}${YY}frl_xml.zip"
+            if curl -sIfL -A "fide-tracker/1.0 (+monthly rating-history sync)" "$URL" >/dev/null; then
+              echo "found    $URL"
+            else
+              echo "missing  $URL — deferring the build to a later run."
+              READY=false
+            fi
+          done
+          echo "ready=$READY" >> "$GITHUB_OUTPUT"
+
+      - name: Seed database from the previous release
+        if: steps.check.outputs.publish == 'true' && steps.archives.outputs.ready == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # Each release ships the full history, so start from the previous
@@ -77,7 +102,7 @@ jobs:
           fi
 
       - name: Backfill history (last 24 months)
-        if: steps.check.outputs.publish == 'true'
+        if: steps.check.outputs.publish == 'true' && steps.archives.outputs.ready == 'true'
         working-directory: backend
         # One-time: downloads FIDE's archived monthly lists so charts have
         # two years of data (~1-2 h on the first run). Once the seeded
@@ -85,7 +110,7 @@ jobs:
         run: python -m ingestion.backfill --months 24
 
       - name: Build SQLite database (current month)
-        if: steps.check.outputs.publish == 'true'
+        if: steps.check.outputs.publish == 'true' && steps.archives.outputs.ready == 'true'
         working-directory: backend
         run: |
           python -m ingestion.ingest --period "${{ steps.period.outputs.value }}"
@@ -93,7 +118,7 @@ jobs:
           ls -lh fide.db
 
       - name: Publish release
-        if: steps.check.outputs.publish == 'true'
+        if: steps.check.outputs.publish == 'true' && steps.archives.outputs.ready == 'true'
         working-directory: backend
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
