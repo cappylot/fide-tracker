@@ -206,12 +206,11 @@ actor FIDEDatabase {
     func search(_ query: String, limit: Int = 25) async throws -> [PlayerSummary] {
         let queue = try requireQueue()
         let trimmed = query.trimmingCharacters(in: .whitespaces)
-        return try await queue.read { db in
-            let latest = try String.fetchOne(db, sql: "SELECT MAX(period) FROM rating_snapshot")
 
-            let rows: [SummaryRow]
-            if !trimmed.isEmpty, trimmed.allSatisfy(\.isNumber), let id = Int64(trimmed) {
-                rows = try SummaryRow.fetchAll(db, sql: """
+        if !trimmed.isEmpty, trimmed.allSatisfy(\.isNumber), let id = Int64(trimmed) {
+            return try await queue.read { db in
+                let latest = try String.fetchOne(db, sql: "SELECT MAX(period) FROM rating_snapshot")
+                let rows = try SummaryRow.fetchAll(db, sql: """
                     SELECT p.fide_id, p.name, p.federation, p.title, p.flag,
                            s.standard, s.rapid, s.blitz
                     FROM player p
@@ -219,20 +218,69 @@ actor FIDEDatabase {
                     WHERE p.fide_id = ?
                     LIMIT ?
                     """, arguments: [latest, id, limit])
-            } else {
-                // In SQLite, NULLs sort last under DESC, so unrated players fall
-                // to the bottom without an explicit NULLS LAST clause.
-                rows = try SummaryRow.fetchAll(db, sql: """
-                    SELECT p.fide_id, p.name, p.federation, p.title, p.flag,
-                           s.standard, s.rapid, s.blitz
-                    FROM player p
-                    LEFT JOIN rating_snapshot s ON s.fide_id = p.fide_id AND s.period = ?
-                    WHERE p.name LIKE ?
-                    ORDER BY s.standard DESC
-                    LIMIT ?
-                    """, arguments: [latest, "%\(trimmed)%", limit])
+                return rows.map(\.summary)
             }
-            return rows.map(\.summary)
+        }
+
+        guard let fuzzy = FuzzyNameQuery(trimmed) else { return [] }
+
+        return try await queue.read { db in
+            let latest = try String.fetchOne(db, sql: "SELECT MAX(period) FROM rating_snapshot")
+            let summarySelect = """
+                SELECT p.fide_id, p.name, p.federation, p.title, p.flag,
+                       s.standard, s.rapid, s.blitz
+                FROM player p
+                LEFT JOIN rating_snapshot s ON s.fide_id = p.fide_id AND s.period = ?
+                """
+
+            // Pass 1: every query token appears as a substring, in any order,
+            // so "Magnus Carlsen", "Carlsen, Magnus", and the partially typed
+            // "Magnus Carlse" all match the stored "Carlsen, Magnus".
+            // In SQLite, NULLs sort last under DESC, so unrated players fall
+            // to the bottom without an explicit NULLS LAST clause.
+            var args: [(any DatabaseValueConvertible)?] = [latest]
+            args += fuzzy.substringPatterns
+            args.append(limit)
+            let exactRows = try SummaryRow.fetchAll(db, sql: """
+                \(summarySelect)
+                WHERE \(fuzzy.substringPatterns.map { _ in "p.name LIKE ?" }.joined(separator: " AND "))
+                ORDER BY s.standard DESC
+                LIMIT ?
+                """, arguments: StatementArguments(args))
+
+            guard exactRows.count < limit, fuzzy.toleratesTypos else {
+                return exactRows.map(\.summary)
+            }
+
+            // Pass 2: typo-tolerant. A name matching a token with at most N
+            // typos still contains one of the token's N+1 pieces unchanged,
+            // so cheap LIKEs on the pieces prefilter candidates; the top-rated
+            // candidates are then re-ranked by edit distance in Swift.
+            var groupClauses: [String] = []
+            args = [latest]
+            for group in fuzzy.blockingPatternGroups {
+                groupClauses.append("(" + group.map { _ in "p.name LIKE ?" }.joined(separator: " OR ") + ")")
+                args += group
+            }
+            let candidates = try SummaryRow.fetchAll(db, sql: """
+                \(summarySelect)
+                WHERE \(groupClauses.joined(separator: " AND "))
+                ORDER BY s.standard DESC
+                LIMIT 3000
+                """, arguments: StatementArguments(args))
+
+            let alreadyFound = Set(exactRows.map(\.fideId))
+            let fuzzyRows = candidates
+                .filter { !alreadyFound.contains($0.fideId) }
+                .compactMap { row in fuzzy.cost(ofName: row.name).map { (row: row, cost: $0) } }
+                .sorted {
+                    if $0.cost != $1.cost { return $0.cost < $1.cost }
+                    return ($0.row.standard ?? -1) > ($1.row.standard ?? -1)
+                }
+                .prefix(limit - exactRows.count)
+                .map(\.row)
+
+            return (exactRows + fuzzyRows).map(\.summary)
         }
     }
 

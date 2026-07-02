@@ -49,7 +49,7 @@ The app checks for updates in the background. Pull-to-refresh on the Tracked tab
 
 ## Features
 
-- **Search:** By player name or FIDE-ID. Ranks results by rating.
+- **Search:** By player name or FIDE-ID. Name matching is word-order independent ("Magnus Carlsen" and "Carlsen, Magnus" both work), tolerates typos ("Magnis Carlsen"), and matches partial names ("Magnus Carlse"). Ranks exact matches by rating, then near-matches by closeness. The last 5 searches are shown until you start typing.
 - **Top:** View top-100 by rating type (Standard/Rapid/Blitz), optionally filter by federation.
 - **Player detail:** Full profile + monthly history as a Swift Charts line graph + all-time delta.
 - **Tracked:** Star players from Search or Top. Shows your favourites + latest month-over-month change.

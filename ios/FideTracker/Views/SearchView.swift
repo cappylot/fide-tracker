@@ -6,16 +6,24 @@ struct SearchView: View {
     @State private var isLoading = false
     @State private var errorText: String?
     @State private var searchTask: Task<Void, Never>?
+    @StateObject private var history = SearchHistoryStore()
 
     var body: some View {
         List {
             if let errorText {
                 Text(errorText).foregroundStyle(.secondary)
             }
+            if query.isEmpty {
+                recentSearches
+            }
             ForEach(results) { player in
                 NavigationLink(value: player.fideId) {
                     PlayerRow(player: player)
                 }
+                // A tap on a result is what makes a query worth remembering;
+                // recording on every keystroke would fill the history with
+                // half-typed prefixes.
+                .simultaneousGesture(TapGesture().onEnded { history.record(query) })
             }
         }
         .navigationTitle("FIDE Players")
@@ -23,11 +31,40 @@ struct SearchView: View {
             PlayerDetailView(fideId: fideId)
         }
         .searchable(text: $query, prompt: "Name or FIDE-ID")
+        .onSubmit(of: .search) { history.record(query) }
         .onChange(of: query) { _ in scheduleSearch() }
         .overlay {
             if isLoading { ProgressView() }
             else if results.isEmpty && !query.isEmpty && errorText == nil {
                 ContentUnavailableViewCompat(text: "No players found")
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var recentSearches: some View {
+        if !history.entries.isEmpty {
+            Section {
+                ForEach(history.entries, id: \.self) { term in
+                    Button {
+                        query = term  // onChange(of: query) runs the search
+                    } label: {
+                        Label {
+                            Text(term).foregroundStyle(.primary)
+                        } icon: {
+                            Image(systemName: "clock.arrow.circlepath")
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                .onDelete { history.remove(atOffsets: $0) }
+            } header: {
+                HStack {
+                    Text("Recent Searches")
+                    Spacer()
+                    Button("Clear") { history.clear() }
+                        .font(.caption)
+                }
             }
         }
     }
